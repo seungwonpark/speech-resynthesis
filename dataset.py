@@ -6,7 +6,9 @@
 
 # Adapted from https://github.com/jik876/hifi-gan
 
+import os
 import random
+import hashlib
 from pathlib import Path
 
 import amfm_decompy.basic_tools as basic
@@ -29,9 +31,16 @@ def get_yaapt_f0(audio, rate=16000, interp=False):
     f0s = []
     for y in audio.astype(np.float64):
         y_pad = np.pad(y.squeeze(), (to_pad, to_pad), "constant", constant_values=0)
-        signal = basic.SignalObj(y_pad, rate)
-        pitch = pYAAPT.yaapt(signal, **{'frame_length': frame_length, 'frame_space': 5.0, 'nccf_thresh1': 0.25,
-                                        'tda_frame_length': 25.0})
+        hash = hashlib.md5(y_pad.data.tobytes()).hexdigest()
+        cache_path = os.path.join('cache', '%s.npy' % hash)
+        if os.path.exists(cache_path):
+            pitch = np.load(cache_path)
+        else:
+            signal = basic.SignalObj(y_pad, rate)
+            pitch = pYAAPT.yaapt(signal, **{'frame_length': frame_length, 'frame_space': 5.0, 'nccf_thresh1': 0.25,
+                                            'tda_frame_length': 25.0})
+            np.save(cache_path, pitch)
+
         if interp:
             f0s += [pitch.samp_interp[None, None, :]]
         else:

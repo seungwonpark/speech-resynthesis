@@ -2,4 +2,4 @@ __pycache__/
 *.pyc
 checkpoints/
 data/
-cache/
+cache/*.npy
