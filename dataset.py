@@ -216,6 +216,7 @@ class CodeDataset(torch.utils.data.Dataset):
         interval_end = N // lcm - seq_len // lcm
 
         start_step = random.randint(interval_start, interval_end)
+        start_step = 0
 
         new_seqs = []
         for i, v in enumerate(seqs):
@@ -368,6 +369,7 @@ class F0Dataset(torch.utils.data.Dataset):
         interval_end = N // lcm - seq_len // lcm
 
         start_step = random.randint(interval_start, interval_end)
+        start_step = 0
 
         new_seqs = []
         for i, v in enumerate(seqs):
